@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#FBF7F0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Your weekly guide, made for you</title>
+<style>
+  /* ============================================================
+     Venice Weekly, Family onboarding quiz
+     Warm, light, mobile-first. No dark backgrounds.
+     All inline. No external fonts / images / CDNs.
+     ============================================================ */
+
+  :root {
+    /* Warm light palette (cream / sand / sage / terracotta) */
+    --bg:        #FBF7F0;
+    --bg2:       #F5ECDD;
+    --surface:   #FFFFFF;
+    --card:      #FFFDF9;
+    --ink:       #2E2A24;
+    --ink-soft:  #5B5347;
+    --muted:     #8A7F6D;
+    --line:      #ECE1CE;
+    --line2:     #E3D6BE;
+    --sage:      #6E8A5E;
+    --terra:     #C0603C;
+    --gold:      #E3B24C;
+    --gold-soft: #F7E9C4;
+
+    /* Per-household accent (overridden in JS) */
+    --accent:      #6E8A5E;
+    --accent-deep: #4F6B41;
+    --accent-soft: #E9F0E2;
+    --accent-ink:  #33452a;
+
+    --radius:  20px;
+    --radius-s: 14px;
+    --tap: 52px;
+    --maxw: 560px;
+    --shadow: 0 10px 30px rgba(60,48,30,0.08);
+    --shadow-s: 0 4px 14px rgba(60,48,30,0.07);
+    --font: "Lexend", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background:
+      radial-gradient(1100px 620px at 82% -8%, var(--accent-soft) 0%, rgba(255,255,255,0) 58%),
+      radial-gradient(900px 520px at 8% 108%, var(--gold-soft) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 18px calc(120px + env(safe-area-inset-bottom));
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+
+  /* ---- Top progress ---- */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, var(--bg) 62%, rgba(251,247,240,0));
+    padding: 12px 0 10px;
+    margin-bottom: 6px;
+  }
+  .brandrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    color: var(--accent-deep);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .stepcount {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .progress {
+    height: 9px;
+    border-radius: 999px;
+    background: #EEE3D0;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(60,48,30,0.08);
+  }
+  .progress > i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 130%);
+    transition: width .5s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ---- Screens ---- */
+  .screen { display: none; }
+  .screen.active {
+    display: block;
+    animation: rise .42s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .kicker {
+    display: inline-block;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: clamp(26px, 7vw, 34px);
+    line-height: 1.12;
+    letter-spacing: -0.4px;
+    margin: 4px 0 12px;
+    font-weight: 700;
+  }
+  h2.q {
+    font-size: clamp(21px, 5.6vw, 26px);
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+    margin: 2px 0 6px;
+    font-weight: 700;
+  }
+  .lead {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+  .hint {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 2px 0 16px;
+  }
+  .helper {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--accent-deep);
+    min-height: 20px;
+    margin: 12px 0 2px;
+  }
+  .helper.warn { color: var(--terra); }
+
+  /* ---- Welcome card ---- */
+  .welcome-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 20px 22px;
+    box-shadow: var(--shadow);
+    margin-top: 6px;
+  }
+  .hello-emoji { font-size: 40px; line-height: 1; margin-bottom: 8px; }
+  .meta-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .meta-pill {
+    font-size: 13px; font-weight: 600; color: var(--ink-soft);
+    background: var(--bg2); border: 1px solid var(--line);
+    padding: 8px 12px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* ---- Chip grid (interests) ---- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .chip {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    min-height: var(--tap);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 13px;
+    border-radius: var(--radius-s);
+    border: 1.5px solid var(--line2);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: transform .12s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+  }
+  .chip .emo { font-size: 21px; line-height: 1; flex: 0 0 auto; }
+  .chip .lbl { flex: 1 1 auto; }
+  .chip .tick {
+    flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--line2);
+    display: grid; place-items: center;
+    color: #fff; font-size: 13px; font-weight: 800;
+    transition: background .16s ease, border-color .16s ease, transform .16s ease;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 6px 16px rgba(60,48,30,0.08);
+  }
+  .chip[aria-pressed="true"] .tick {
+    background: var(--accent); border-color: var(--accent);
+    transform: scale(1);
+  }
+  .chip[aria-pressed="true"] .tick::after { content: "\2713"; }
+  .chip.pop { animation: pop .28s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  /* ---- Ranking ---- */
+  .ranklist { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .rankitem {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card);
+    border: 1.5px solid var(--line2);
+    border-radius: var(--radius-s);
+    padding: 9px 10px 9px 12px;
+    min-height: var(--tap);
+    transition: border-color .16s ease, background .16s ease, transform .2s cubic-bezier(.22,1,.36,1);
+  }
+  .rankitem.top5 { border-color: var(--gold); background: linear-gradient(180deg, #FFFCF4, var(--gold-soft)); }
+  .rankitem .rank-badge {
+    flex: 0 0 auto; width: 28px; height: 28px; border-radius: 9px;
+    background: var(--bg2); color: var(--muted);
+    display: grid; place-items: center; font-weight: 800; font-size: 14px;
+  }
+  .rankitem.top5 .rank-badge { background: var(--gold); color: #4b3a10; }
+  .rankitem .r-emo { font-size: 19px; }
+  .rankitem .r-lbl { flex: 1 1 auto; font-weight: 650; font-size: 15px; }
+  .rankitem .r-lbl small { display:block; font-weight:600; font-size:11px; color: var(--gold); letter-spacing:.6px; text-transform:uppercase; }
+  .arrows { display: flex; flex-direction: column; gap: 4px; }
+  .abtn {
+    appearance: none; font-family: inherit; cursor: pointer;
+    width: 34px; height: 24px; border-radius: 8px;
+    border: 1.5px solid var(--line2); background: var(--surface);
+    color: var(--accent-deep); font-size: 13px; line-height: 1;
+    display: grid; place-items: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .14s ease, transform .1s ease, opacity .14s ease;
+  }
+  .abtn:hover { background: var(--accent-soft); }
+  .abtn:active { transform: scale(.9); }
+  .abtn[disabled] { opacity: .32; cursor: default; }
+
+  /* ---- Calibration cards ---- */
+  .calib-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .evt {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    box-shadow: var(--shadow-s);
+    padding: 14px 14px 12px;
+    transition: border-color .16s ease, box-shadow .16s ease;
+  }
+  .evt.voted-up   { border-color: var(--sage);  box-shadow: 0 6px 16px rgba(110,138,94,0.18); }
+  .evt.voted-down { border-color: #d9a99a; background: #FFFBFA; }
+  .evt.voted-meh  { border-color: var(--line2); }
+  .evt-top { display: flex; gap: 11px; align-items: flex-start; }
+  .evt .e-emo { font-size: 26px; line-height: 1; flex: 0 0 auto; }
+  .evt .e-title { font-size: 15.5px; font-weight: 650; line-height: 1.3; }
+  .votes { display: flex; gap: 8px; margin-top: 12px; }
+  .vote {
+    flex: 1 1 0;
+    appearance: none; font-family: inherit; cursor: pointer;
+    min-height: 46px; border-radius: 12px;
+    border: 1.5px solid var(--line2); background: var(--card);
+    color: var(--ink-soft); font-size: 14px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .12s ease, background .16s ease, border-color .16s ease, color .16s ease;
+  }
+  .vote .vemo { font-size: 18px; }
+  .vote:active { transform: scale(.94); }
+  .vote.sel-up   { background: #E7F1DF; border-color: var(--sage);  color: var(--accent-deep); }
+  .vote.sel-meh  { background: #F1EADA; border-color: var(--line2); color: var(--ink); }
+  .vote.sel-down { background: #FBE7DF; border-color: var(--terra); color: #8a3d22; }
+  .vote.bump { animation: pop .28s cubic-bezier(.34,1.56,.64,1); }
+
+  /* ---- Logistics groups ---- */
+  .qgroup { margin-top: 22px; }
+  .qgroup:first-of-type { margin-top: 6px; }
+  .qgroup > .qlabel { font-size: 16px; font-weight: 700; margin: 0 0 10px; letter-spacing: -0.2px; }
+  .optrow { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt {
+    appearance: none; font-family: inherit; cursor: pointer;
+    min-height: 48px; padding: 10px 15px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line2); background: var(--card);
+    color: var(--ink); font-size: 14.5px; font-weight: 650;
+    display: inline-flex; align-items: center; gap: 7px;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .12s ease, background .16s ease, border-color .16s ease;
+  }
+  .opt:hover { border-color: var(--accent); }
+  .opt:active { transform: scale(.95); }
+  .opt[aria-pressed="true"] {
+    background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink);
+    box-shadow: 0 5px 13px rgba(60,48,30,0.08);
+  }
+  .opt.pop { animation: pop .28s cubic-bezier(.34,1.56,.64,1); }
+
+  /* ---- Free text ---- */
+  .field { margin-top: 18px; }
+  .field:first-of-type { margin-top: 4px; }
+  .field label { display: block; font-size: 15.5px; font-weight: 650; margin-bottom: 8px; }
+  .field .sub { font-weight: 600; color: var(--muted); font-size: 13px; }
+  textarea, input[type="text"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px; /* 16px avoids iOS zoom on focus */
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--line2);
+    border-radius: var(--radius-s);
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 58px;
+    transition: border-color .16s ease, box-shadow .16s ease;
+  }
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  /* ---- Thank you ---- */
+  .thanks-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px 22px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    margin-top: 10px;
+  }
+  .thanks-emoji { font-size: 54px; line-height: 1; margin-bottom: 6px; }
+  .thanks-card h1 { margin-top: 6px; }
+  .signoff { margin-top: 18px; font-size: 15px; color: var(--ink-soft); font-style: italic; }
+  .save-note {
+    margin-top: 20px; font-size: 13px; color: var(--muted);
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--bg2); padding: 8px 14px; border-radius: 999px;
+  }
+  .spin {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2.5px solid var(--line2); border-top-color: var(--accent);
+    display: inline-block; animation: spin .8s linear infinite; vertical-align: -4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .errbox {
+    margin-top: 18px; text-align: left;
+    background: #FBE9E1; border: 1px solid #E7BDA9;
+    color: #8a3d22; border-radius: var(--radius-s);
+    padding: 14px 15px; font-size: 14px; font-weight: 600;
+  }
+  .substate { display: none; }
+  .substate.on { display: block; }
+
+  /* ---- Nav (sticky footer) ---- */
+  .nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    background: linear-gradient(180deg, rgba(245,236,221,0), var(--bg2) 42%);
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+  }
+  .nav-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .btn {
+    appearance: none; font-family: inherit; cursor: pointer;
+    min-height: var(--tap); border-radius: 999px;
+    font-size: 16px; font-weight: 700; letter-spacing: .1px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .1s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease;
+  }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .btn-primary {
+    flex: 1 1 auto;
+    background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+    color: #fff;
+    padding: 0 22px;
+    box-shadow: 0 8px 20px rgba(60,48,30,0.18);
+  }
+  .btn-primary[disabled] { opacity: .45; cursor: default; box-shadow: none; }
+  .btn-ghost {
+    flex: 0 0 auto;
+    background: var(--surface);
+    color: var(--ink-soft);
+    border: 1.5px solid var(--line2);
+    padding: 0 20px;
+  }
+  .btn-ghost.hidden { display: none; }
+
+  /* ---- Focus visibility (keyboard) ---- */
+  :focus-visible {
+    outline: 3px solid var(--accent-deep);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* ---- Confetti ---- */
+  #confetti {
+    position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden;
+  }
+  #confetti span {
+    position: absolute; top: 46%; font-size: 22px; will-change: transform, opacity;
+    animation: burst 1200ms cubic-bezier(.15,.7,.3,1) forwards;
+  }
+  @keyframes burst {
+    0% { transform: translate(-50%,-50%) scale(.6); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1); opacity: 0; }
+  }
+
+  @media (min-width: 480px) {
+    .grid { gap: 12px; }
+  }
+
+  /* ---- Reduced motion ---- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    .screen.active { animation: none; }
+    #confetti { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar" id="topbar">
+    <div class="wrap" style="padding-bottom:0;">
+      <div class="brandrow">
+        <span class="brand"><span class="dot"></span><span id="brandName">Your Weekly Guide</span></span>
+        <span class="stepcount" id="stepCount"></span>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+        <i id="progressFill"></i>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap" id="main">
+
+    <!-- 0. WELCOME -->
+    <section class="screen" id="s-welcome" aria-labelledby="welcomeH" tabindex="-1">
+      <div class="welcome-card">
+        <div class="hello-emoji" id="welcomeEmoji">💌</div>
+        <span class="kicker" id="welcomeKicker">A little surprise</span>
+        <h1 id="welcomeH">Hi there.</h1>
+        <p class="lead" id="welcomeLead"></p>
+        <div class="meta-pills">
+          <span class="meta-pill">⏱️ About 2 minutes</span>
+          <span class="meta-pill">👆 Mostly tapping</span>
+          <span class="meta-pill">💾 Saves as you go</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. INTERESTS -->
+    <section class="screen" id="s-interests" aria-labelledby="interestsH" tabindex="-1">
+      <span class="kicker">What you love</span>
+      <h2 class="q" id="interestsH">What kinds of outings are your thing?</h2>
+      <p class="hint">Tap everything that sounds nice. Pick at least 3, more is welcome.</p>
+      <div class="grid" id="interestGrid" role="group" aria-label="Interest categories"></div>
+      <p class="helper" id="interestsHelper" aria-live="polite"></p>
+    </section>
+
+    <!-- 2. RANKING -->
+    <section class="screen" id="s-ranking" aria-labelledby="rankingH" tabindex="-1">
+      <span class="kicker">Your top picks</span>
+      <h2 class="q" id="rankingH">Now, order your favorites.</h2>
+      <p class="hint">Nudge your top 5 to the top with the arrows. The gold ones are what we will lead with.</p>
+      <ol class="ranklist" id="rankList" aria-label="Your interests in order"></ol>
+    </section>
+
+    <!-- 3. CALIBRATION -->
+    <section class="screen" id="s-calib" aria-labelledby="calibH" tabindex="-1">
+      <span class="kicker">A quick taste test</span>
+      <h2 class="q" id="calibH">Would you go to these?</h2>
+      <p class="hint">Real examples from near you. A quick thumbs teaches us more than any checkbox.</p>
+      <div class="calib-stack" id="calibStack"></div>
+    </section>
+
+    <!-- 4. LOGISTICS -->
+    <section class="screen" id="s-logistics" aria-labelledby="logiH" tabindex="-1">
+      <span class="kicker">The little things</span>
+      <h2 class="q" id="logiH">A few comfort details.</h2>
+      <p class="hint" id="logiHint">So every pick actually fits your day. All optional, but they help a lot.</p>
+      <div id="logisticsGroups"></div>
+    </section>
+
+    <!-- 5. FREE TEXT -->
+    <section class="screen" id="s-free" aria-labelledby="freeH" tabindex="-1">
+      <span class="kicker">In your words</span>
+      <h2 class="q" id="freeH">Anything you want us to know?</h2>
+      <p class="hint">All optional. Even a word or two helps us get you right.</p>
+      <div class="field">
+        <label for="ftLove">Anything you love that we should always try to include?</label>
+        <textarea id="ftLove" rows="2" placeholder="e.g. live jazz, anything at the Wende, a good farmers market..."></textarea>
+      </div>
+      <div class="field">
+        <label for="ftNever">Anything you never want to see?</label>
+        <textarea id="ftNever" rows="2" placeholder="e.g. late nights, big loud crowds, long walks..."></textarea>
+      </div>
+      <div class="field">
+        <label for="ftSpot">A favorite spot near you? <span class="sub">(we will keep an eye out for it)</span></label>
+        <input type="text" id="ftSpot" placeholder="e.g. a park, a theater, a restaurant you love" />
+      </div>
+    </section>
+
+    <!-- 6. CADENCE -->
+    <section class="screen" id="s-cadence" aria-labelledby="cadH" tabindex="-1">
+      <span class="kicker">How often</span>
+      <h2 class="q" id="cadH">And how often should it land?</h2>
+      <p class="hint">Pick a rhythm and a day that feels good.</p>
+      <div class="qgroup">
+        <p class="qlabel">How often?</p>
+        <div class="optrow" id="freqRow" role="group" aria-label="How often"></div>
+      </div>
+      <div class="qgroup">
+        <p class="qlabel">Best day to receive it?</p>
+        <div class="optrow" id="dayRow" role="group" aria-label="Preferred day"></div>
+      </div>
+    </section>
+
+    <!-- 7. THANK YOU -->
+    <section class="screen" id="s-thanks" aria-labelledby="thanksH" tabindex="-1">
+      <div class="thanks-card">
+        <!-- sending -->
+        <div class="substate" id="ss-sending">
+          <div class="thanks-emoji">💾</div>
+          <h1>Saving your answers...</h1>
+          <p class="lead"><span class="spin"></span></p>
+        </div>
+        <!-- done -->
+        <div class="substate" id="ss-done">
+          <div class="thanks-emoji" id="thanksEmoji">🎉</div>
+          <h1 id="thanksH">All set. Thank you!</h1>
+          <p class="lead" id="thanksLead"></p>
+          <p class="signoff" id="thanksSignoff"></p>
+          <div class="save-note">✅ Saved. Nothing else to do.</div>
+        </div>
+        <!-- error -->
+        <div class="substate" id="ss-error">
+          <div class="thanks-emoji">🌱</div>
+          <h1>Almost there.</h1>
+          <p class="lead">Your answers are safe on this device, we just could not send them up right now.</p>
+          <div class="errbox" id="errDetail">No connection to the guide. Give it another go in a moment.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sticky nav -->
+  <nav class="nav" id="nav" aria-label="Quiz navigation">
+    <div class="nav-inner">
+      <button class="btn btn-ghost hidden" id="backBtn" type="button">Back</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Let's go</button>
+    </div>
+  </nav>
+
+  <div id="confetti" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     BACKEND URL
+     Paste the Apps Script Web App /exec URL here after deploy.
+     Leave blank to run in "local-only" mode (great for previewing):
+     answers still save to localStorage, the thank-you still shows.
+     ============================================================ */
+  const BACKEND_URL = '';
+
+  const SCHEMA_VERSION = '1.0';
+
+  /* ---------------- Interest categories (16) ---------------- */
+  const CATEGORIES = [
+    { id: 'arts_theater',            emo: '🎭', label: 'Arts & theater' },
+    { id: 'live_music',              emo: '🎸', label: 'Live music' },
+    { id: 'concerts_classical_jazz', emo: '🎷', label: 'Classical & jazz' },
+    { id: 'museums_galleries',       emo: '🖼️', label: 'Museums & galleries' },
+    { id: 'film',                    emo: '🎬', label: 'Film' },
+    { id: 'dining_out',              emo: '🍽️', label: 'Dining out' },
+    { id: 'farmers_markets',         emo: '🥕', label: 'Farmers markets' },
+    { id: 'food_festivals',          emo: '🌮', label: 'Food festivals' },
+    { id: 'outdoors_hikes',          emo: '🌄', label: 'Outdoors & hikes' },
+    { id: 'gardening_plants',        emo: '🌿', label: 'Gardening & plants' },
+    { id: 'maker_flea_markets',      emo: '🧵', label: 'Maker & flea markets' },
+    { id: 'author_talks',            emo: '📚', label: 'Author talks & lectures' },
+    { id: 'wine_tastings',           emo: '🍷', label: 'Wine & tastings' },
+    { id: 'family_kids',             emo: '🧒', label: 'Family & kids' },
+    { id: 'wellness_fitness',        emo: '🧘', label: 'Wellness & fitness' },
+    { id: 'festivals',               emo: '🎪', label: 'Festivals' }
+  ];
+  const CAT_BY_ID = {};
+  CATEGORIES.forEach(c => { CAT_BY_ID[c.id] = c; });
+
+  /* ---------------- Logistics question sets ---------------- */
+  const LOGISTICS = {
+    shared: [
+      { key: 'budget', label: 'What feels comfortable to spend?', type: 'single', options: [
+        { v: 'free_first', l: '🆓 Free is great' },
+        { v: 'low',        l: '$ Keep it low' },
+        { v: 'mid',        l: '$$ Mid is fine' },
+        { v: 'splurge_ok', l: '$$$ Splurge now and then' }
+      ]},
+      { key: 'picks_per_week', label: 'How many picks per week feels right?', type: 'single', options: [
+        { v: '1_2',  l: 'Just 1 or 2 ✨' },
+        { v: '2_3',  l: '2 or 3' },
+        { v: '4_5',  l: '4 or 5' },
+        { v: 'lots', l: 'Show me everything' }
+      ]}
+    ],
+    drive: [
+      { key: 'parking', label: 'Parking that feels easy?', type: 'single', options: [
+        { v: 'valet_only',    l: '🅿️ Valet, please' },
+        { v: 'easy_lot_only', l: 'Easy lot only' },
+        { v: 'street_ok',     l: 'Street is fine' }
+      ]},
+      { key: 'max_walking', label: 'How much walking is comfortable?', type: 'single', options: [
+        { v: 'curb_to_seat', l: '🚶 Curb to seat' },
+        { v: 'a_block',      l: 'About a block' },
+        { v: 'more_ok',      l: 'More is fine' }
+      ]},
+      { key: 'indoor_outdoor', label: 'Indoors or out?', type: 'single', options: [
+        { v: 'indoor',     l: '🏛️ Indoors' },
+        { v: 'mix',        l: 'A mix' },
+        { v: 'outdoor_ok', l: 'Outdoors is fine' }
+      ]},
+      { key: 'time_of_day', label: 'Best time of day?', type: 'single', options: [
+        { v: 'daytime',       l: '☀️ Daytime' },
+        { v: 'early_evening', l: '🌇 Early evening' },
+        { v: 'night_ok',      l: '🌙 Night is fine' }
+      ]},
+      { key: 'max_drive_min', label: 'How far are you happy to drive?', type: 'single', options: [
+        { v: '15', l: '15 min' },
+        { v: '30', l: '30 min' },
+        { v: '45', l: '45 min' }
+      ]}
+    ],
+    dog: [
+      { key: 'dog_friendly', label: 'How much does dog-friendly matter?', type: 'single', options: [
+        { v: 'must',           l: '🐕 Yoshi must come' },
+        { v: 'nice',           l: 'Nice when it works' },
+        { v: 'doesnt_matter',  l: "Doesn't matter" }
+      ]},
+      { key: 'getting_there', label: 'How do you like to get around?', type: 'multi', options: [
+        { v: 'bike',  l: '🚲 Bike' },
+        { v: 'walk',  l: '🚶 Walk' },
+        { v: 'drive', l: '🚗 Drive' }
+      ]},
+      { key: 'outdoor_comfort', label: 'Outdoor events?', type: 'single', options: [
+        { v: 'love',          l: '🌞 Love them' },
+        { v: 'mixed',         l: 'A mix' },
+        { v: 'prefer_indoor', l: 'Prefer indoor' }
+      ]},
+      { key: 'crowd_tolerance', label: 'Crowds?', type: 'single', options: [
+        { v: 'love_buzz',    l: '🎉 Love the buzz' },
+        { v: 'some_ok',      l: 'Some is fine' },
+        { v: 'prefer_quiet', l: '🍃 Prefer it quiet' }
+      ]}
+    ]
+  };
+
+  const FREQ_OPTS = [
+    { v: 'weekly',       l: '📬 Weekly' },
+    { v: 'biweekly',     l: 'Every other week' },
+    { v: 'monthly',      l: 'Monthly' }
+  ];
+  const DAY_OPTS = [
+    { v: 'thursday', l: 'Thu' },
+    { v: 'friday',   l: 'Fri' },
+    { v: 'saturday', l: 'Sat' },
+    { v: 'sunday',   l: 'Sun' },
+    { v: 'monday',   l: 'Mon' }
+  ];
+
+  /* ---------------- Households ---------------- */
+  const CULVER_EXAMPLES = [
+    { id: 'cul_wende_film',       emo: '🎬', tag: 'film',                    title: 'Free evening film, plus Tim Robbins in conversation, at the Wende Museum' },
+    { id: 'cul_jazz_belair',      emo: '🎷', tag: 'concerts_classical_jazz', title: 'A seated dinner-and-jazz show in Bel Air' },
+    { id: 'cul_theater_matinee',  emo: '🎭', tag: 'arts_theater',            title: 'A Saturday matinee community-theater play in Westchester' },
+    { id: 'cul_helms_gallery',    emo: '🖼️', tag: 'museums_galleries',       title: 'A 100-artist gallery show at Helms, walk right in' },
+    { id: 'cul_author_larchmont', emo: '📚', tag: 'author_talks',            title: 'An author talk at a Larchmont bookstore' },
+    { id: 'cul_wine_tasting',     emo: '🍷', tag: 'wine_tastings',           title: 'A guided Pacific Northwest wine tasting nearby (about $20)' },
+    { id: 'cul_afternoon_tea',    emo: '🫖', tag: 'dining_out',              title: 'Afternoon tea in a historic hotel lobby' },
+    { id: 'cul_laemmle_matinee',  emo: '🎬', tag: 'film',                    title: 'An arthouse matinee at the Laemmle' }
+  ];
+  const SILVERLAKE_EXAMPLES = [
+    { id: 'sil_griffith_hike',    emo: '🌄', tag: 'outdoors_hikes',     title: 'A free group sunset hike in Griffith Park (leashed dogs OK)' },
+    { id: 'sil_lotus_festival',   emo: '🎪', tag: 'festivals',          title: 'The Echo Park Lotus Festival, lakeside, dogs welcome' },
+    { id: 'sil_flea_market',      emo: '🧵', tag: 'maker_flea_markets', title: 'The Silverlake Flea, an open-air maker market' },
+    { id: 'sil_gardening_class',  emo: '🌿', tag: 'gardening_plants',   title: 'A native-plant and fruit-tree gardening class' },
+    { id: 'sil_atwater_market',   emo: '🥕', tag: 'farmers_markets',    title: 'The Atwater farmers market (service dogs only inside)' },
+    { id: 'sil_shakespeare_park', emo: '🎭', tag: 'arts_theater',       title: 'Free outdoor Shakespeare in the park' },
+    { id: 'sil_habitat_volunteer',emo: '🌱', tag: 'outdoors_hikes',     title: 'A habitat volunteer morning in Fern Dell' },
+    { id: 'sil_star_party',       emo: '🔭', tag: 'outdoors_hikes',     title: 'A Griffith Observatory public star party' }
+  ];
+  const GENERIC_EXAMPLES = [
+    CULVER_EXAMPLES[0], CULVER_EXAMPLES[3], CULVER_EXAMPLES[5], CULVER_EXAMPLES[6],
+    SILVERLAKE_EXAMPLES[0], SILVERLAKE_EXAMPLES[2], SILVERLAKE_EXAMPLES[4], SILVERLAKE_EXAMPLES[1]
+  ];
+
+  const HOUSEHOLDS = {
+    culver: {
+      key: 'culver',
+      label: 'Lani & Francis',
+      place: 'Culver City',
+      accent: '#C0603C', accentDeep: '#9A4A2C', accentSoft: '#F4E3D9', accentInk: '#7a3a22',
+      brand: 'Culver Weekly',
+      welcomeEmoji: '💐',
+      kicker: 'A little surprise, from Kevin',
+      welcomeH: 'Hi Lani & Francis.',
+      welcomeLead: "I'm putting together a little weekly guide, just for the two of you, to the good stuff happening close to home. Easy, seated, no-fuss outings you will actually enjoy. This quick set of taps (about 2 minutes) tells me what you love, so every week lands right in your wheelhouse.",
+      logistics: 'drive',
+      examples: CULVER_EXAMPLES,
+      logiHint: 'You two drive everywhere and like it comfortable, so this makes sure every pick fits your day. All optional, but they help a lot.',
+      thanksLead: "I'll start pulling together the good stuff near you, tuned to exactly this. Keep an eye on your inbox.",
+      thanksSignoff: 'With love, your son Kevin 💛'
+    },
+    silverlake: {
+      key: 'silverlake',
+      label: 'Stacy, Elliott & Yoshi',
+      place: 'Silver Lake',
+      accent: '#6E8A5E', accentDeep: '#4F6B41', accentSoft: '#E7F0DF', accentInk: '#33452a',
+      brand: 'Silver Lake Weekly',
+      welcomeEmoji: '🌿',
+      kicker: 'A little surprise, from Kevin',
+      welcomeH: 'Hi Stacy & Elliott (and Yoshi).',
+      welcomeLead: "I'm building you a little weekly guide to the good stuff near you, the markets and trails and open-air finds that are made for your kind of weekend (Yoshi included). This quick set of taps (about 2 minutes) tells me what you love, so every week lands right.",
+      logistics: 'dog',
+      examples: SILVERLAKE_EXAMPLES,
+      logiHint: 'So every pick fits your weekend, and Yoshi is never left out by surprise. All optional, but they help a lot.',
+      thanksLead: "I'll start pulling together the good stuff near you, tuned to exactly this (dog days included). Keep an eye on your inbox.",
+      thanksSignoff: 'With love, your brother Kevin 💛'
+    },
+    generic: {
+      key: 'generic',
+      label: 'friend',
+      place: 'your neighborhood',
+      accent: '#6E8A5E', accentDeep: '#4F6B41', accentSoft: '#E7F0DF', accentInk: '#33452a',
+      brand: 'Your Weekly Guide',
+      welcomeEmoji: '💌',
+      kicker: 'A little surprise',
+      welcomeH: 'Hi there.',
+      welcomeLead: "I'm building you a little weekly guide to the good stuff near you. This quick set of taps (about 2 minutes) tells me what you love, so every week lands right.",
+      logistics: 'shared',
+      examples: GENERIC_EXAMPLES,
+      logiHint: 'A few comfort details so every pick fits your day. All optional, but they help.',
+      thanksLead: "I'll start pulling together the good stuff near you, tuned to exactly this. Keep an eye on your inbox.",
+      thanksSignoff: 'With love, Kevin 💛'
+    }
+  };
+
+  function getHousehold() {
+    const p = new URLSearchParams(location.search).get('h');
+    const key = (p || '').toLowerCase().trim();
+    return HOUSEHOLDS[key] || HOUSEHOLDS.generic;
+  }
+  const HH = getHousehold();
+  const STORAGE_KEY = 'venice-quiz-' + HH.key;
+
+  /* ---------------- State ---------------- */
+  const state = {
+    schema_version: SCHEMA_VERSION,
+    household: HH.key,
+    household_label: HH.label,
+    started_at: new Date().toISOString(),
+    step: 0,
+    answers: {
+      interests: [],          // array of category ids (selection order preserved)
+      ranking: [],            // full ordered list of selected ids (top 5 = first 5)
+      calibration: {},        // { exampleId: 'up' | 'meh' | 'down' }
+      logistics: {},          // flat, branch-dependent
+      free_text: { always_include: '', never_show: '', favorite_spot: '' },
+      cadence: { frequency: 'weekly', delivery_day: 'friday' }
+    }
+  };
+
+  /* ---------------- Persistence ---------------- */
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function restore() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+      if (!saved || saved.household !== HH.key) return false;
+      // merge answers shallow-ish
+      state.started_at = saved.started_at || state.started_at;
+      const a = saved.answers || {};
+      state.answers.interests = Array.isArray(a.interests) ? a.interests : [];
+      state.answers.ranking = Array.isArray(a.ranking) ? a.ranking : [];
+      state.answers.calibration = a.calibration || {};
+      state.answers.logistics = a.logistics || {};
+      state.answers.free_text = Object.assign({ always_include:'', never_show:'', favorite_spot:'' }, a.free_text || {});
+      state.answers.cadence = Object.assign({ frequency:'weekly', delivery_day:'friday' }, a.cadence || {});
+      // resume on the last question they were on (never resume into thank-you)
+      state.step = Math.min(saved.step || 0, STEPS.length - 2);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* ---------------- Steps ---------------- */
+  // question steps are indices 1..6; welcome=0, thanks=7
+  const STEPS = ['welcome','interests','ranking','calib','logistics','free','cadence','thanks'];
+  const SCREEN = {};
+  STEPS.forEach(s => { SCREEN[s] = document.getElementById('s-' + s); });
+
+  const el = (id) => document.getElementById(id);
+  const nextBtn = el('nextBtn');
+  const backBtn = el('backBtn');
+  const progressFill = el('progressFill');
+  const progressBar = el('progressBar');
+  const stepCount = el('stepCount');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Populate household chrome ---------------- */
+  function applyHousehold() {
+    const r = document.documentElement.style;
+    r.setProperty('--accent', HH.accent);
+    r.setProperty('--accent-deep', HH.accentDeep);
+    r.setProperty('--accent-soft', HH.accentSoft);
+    r.setProperty('--accent-ink', HH.accentInk);
+    el('brandName').textContent = HH.brand;
+    el('welcomeEmoji').textContent = HH.welcomeEmoji;
+    el('welcomeKicker').textContent = HH.kicker;
+    el('welcomeH').textContent = HH.welcomeH;
+    el('welcomeLead').textContent = HH.welcomeLead;
+    el('logiHint').textContent = HH.logiHint;
+    el('thanksLead').textContent = HH.thanksLead;
+    el('thanksSignoff').textContent = HH.thanksSignoff;
+    document.title = HH.brand + ', made for you';
+  }
+
+  /* ---------------- Build: interests ---------------- */
+  function buildInterests() {
+    const grid = el('interestGrid');
+    grid.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.setAttribute('aria-pressed', state.answers.interests.includes(cat.id) ? 'true' : 'false');
+      b.dataset.id = cat.id;
+      b.innerHTML = '<span class="emo" aria-hidden="true">' + cat.emo + '</span>' +
+                    '<span class="lbl">' + cat.label + '</span>' +
+                    '<span class="tick" aria-hidden="true"></span>';
+      b.addEventListener('click', () => toggleInterest(cat.id, b));
+      grid.appendChild(b);
+    });
+    updateInterestHelper();
+  }
+  function toggleInterest(id, btn) {
+    const list = state.answers.interests;
+    const i = list.indexOf(id);
+    if (i >= 0) { list.splice(i, 1); btn.setAttribute('aria-pressed', 'false'); }
+    else {
+      list.push(id);
+      btn.setAttribute('aria-pressed', 'true');
+      if (!reduceMotion) { btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop'); }
+    }
+    updateInterestHelper();
+    save();
+  }
+  function updateInterestHelper() {
+    const n = state.answers.interests.length;
+    const h = el('interestsHelper');
+    if (n >= 3) { h.textContent = '💛 ' + n + ' picked. Tap Next when you are ready.'; h.classList.remove('warn'); }
+    else { h.textContent = 'Pick at least 3 (you have ' + n + ').'; h.classList.add('warn'); }
+    if (state.step === 1) refreshNav();
+  }
+
+  /* ---------------- Build: ranking ---------------- */
+  function syncRankingFromInterests() {
+    // keep only still-selected ids, then append any newly-selected ones (preserve prior order)
+    const selected = state.answers.interests;
+    let r = state.answers.ranking.filter(id => selected.includes(id));
+    selected.forEach(id => { if (!r.includes(id)) r.push(id); });
+    state.answers.ranking = r;
+  }
+  function buildRanking() {
+    syncRankingFromInterests();
+    const listEl = el('rankList');
+    listEl.innerHTML = '';
+    state.answers.ranking.forEach((id, idx) => {
+      const cat = CAT_BY_ID[id];
+      if (!cat) return;
+      const li = document.createElement('li');
+      li.className = 'rankitem' + (idx < 5 ? ' top5' : '');
+      li.dataset.id = id;
+      const badge = idx < 5 ? String(idx + 1) : '·';
+      const tag = idx < 5 ? '<small>Top 5</small>' : '';
+      li.innerHTML =
+        '<span class="rank-badge" aria-hidden="true">' + badge + '</span>' +
+        '<span class="r-emo" aria-hidden="true">' + cat.emo + '</span>' +
+        '<span class="r-lbl">' + cat.label + tag + '</span>' +
+        '<span class="arrows">' +
+          '<button class="abtn up" type="button" aria-label="Move ' + cat.label + ' up"' + (idx === 0 ? ' disabled' : '') + '>▲</button>' +
+          '<button class="abtn down" type="button" aria-label="Move ' + cat.label + ' down"' + (idx === state.answers.ranking.length - 1 ? ' disabled' : '') + '>▼</button>' +
+        '</span>';
+      li.querySelector('.up').addEventListener('click', () => moveRank(idx, -1));
+      li.querySelector('.down').addEventListener('click', () => moveRank(idx, 1));
+      listEl.appendChild(li);
+    });
+  }
+  function moveRank(idx, dir) {
+    const r = state.answers.ranking;
+    const j = idx + dir;
+    if (j < 0 || j >= r.length) return;
+    const tmp = r[idx]; r[idx] = r[j]; r[j] = tmp;
+    save();
+    buildRanking();
+  }
+
+  /* ---------------- Build: calibration ---------------- */
+  function buildCalibration() {
+    const stack = el('calibStack');
+    stack.innerHTML = '';
+    HH.examples.forEach(ev => {
+      const card = document.createElement('div');
+      card.className = 'evt';
+      const cur = state.answers.calibration[ev.id];
+      if (cur) card.classList.add('voted-' + cur);
+      card.dataset.id = ev.id;
+      card.innerHTML =
+        '<div class="evt-top">' +
+          '<span class="e-emo" aria-hidden="true">' + ev.emo + '</span>' +
+          '<span class="e-title">' + ev.title + '</span>' +
+        '</div>' +
+        '<div class="votes" role="group" aria-label="Rate: ' + ev.title.replace(/"/g,'') + '">' +
+          voteBtn(ev.id, 'up',   '👍', 'Yes', cur) +
+          voteBtn(ev.id, 'meh',  '😐', 'Meh', cur) +
+          voteBtn(ev.id, 'down', '👎', 'Pass', cur) +
+        '</div>';
+      stack.appendChild(card);
+      card.querySelectorAll('.vote').forEach(btn => {
+        btn.addEventListener('click', () => voteCalib(ev.id, btn.dataset.vote, card, btn));
+      });
+    });
+  }
+  function voteBtn(id, val, emo, label, cur) {
+    const sel = cur === val ? ' sel-' + val : '';
+    const pressed = cur === val ? 'true' : 'false';
+    return '<button class="vote' + sel + '" type="button" data-vote="' + val + '" aria-pressed="' + pressed + '">' +
+           '<span class="vemo" aria-hidden="true">' + emo + '</span>' + label + '</button>';
+  }
+  function voteCalib(id, val, card, btn) {
+    const prev = state.answers.calibration[id];
+    if (prev === val) { delete state.answers.calibration[id]; }
+    else { state.answers.calibration[id] = val; }
+    // repaint this card
+    card.classList.remove('voted-up','voted-meh','voted-down');
+    const nowVal = state.answers.calibration[id];
+    if (nowVal) card.classList.add('voted-' + nowVal);
+    card.querySelectorAll('.vote').forEach(b => {
+      const on = b.dataset.vote === nowVal;
+      b.classList.remove('sel-up','sel-meh','sel-down');
+      if (on) b.classList.add('sel-' + b.dataset.vote);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (nowVal && !reduceMotion) { btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump'); }
+    save();
+  }
+
+  /* ---------------- Build: logistics ---------------- */
+  function buildLogistics() {
+    const wrap = el('logisticsGroups');
+    wrap.innerHTML = '';
+    const branch = HH.logistics;
+    const groups = LOGISTICS.shared.concat(branch === 'shared' ? [] : (LOGISTICS[branch] || []));
+    groups.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'qgroup';
+      const cur = state.answers.logistics[g.key];
+      let opts = '';
+      g.options.forEach(o => {
+        const on = g.type === 'multi'
+          ? (Array.isArray(cur) && cur.includes(o.v))
+          : (cur === o.v);
+        opts += '<button class="opt" type="button" data-key="' + g.key + '" data-type="' + g.type + '" data-val="' + o.v + '" aria-pressed="' + (on ? 'true':'false') + '">' + o.l + '</button>';
+      });
+      div.innerHTML = '<p class="qlabel">' + g.label + '</p><div class="optrow" role="group" aria-label="' + g.label.replace(/"/g,'') + '">' + opts + '</div>';
+      wrap.appendChild(div);
+    });
+    wrap.querySelectorAll('.opt').forEach(btn => {
+      btn.addEventListener('click', () => pickLogistic(btn));
+    });
+  }
+  function pickLogistic(btn) {
+    const key = btn.dataset.key, type = btn.dataset.type, val = btn.dataset.val;
+    if (type === 'multi') {
+      let arr = Array.isArray(state.answers.logistics[key]) ? state.answers.logistics[key].slice() : [];
+      const i = arr.indexOf(val);
+      if (i >= 0) { arr.splice(i, 1); btn.setAttribute('aria-pressed','false'); }
+      else { arr.push(val); btn.setAttribute('aria-pressed','true'); }
+      state.answers.logistics[key] = arr;
+    } else {
+      const same = state.answers.logistics[key] === val;
+      state.answers.logistics[key] = same ? undefined : val;
+      if (same) delete state.answers.logistics[key];
+      // clear siblings
+      btn.parentElement.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', o === btn && !same ? 'true' : 'false'));
+    }
+    if (!reduceMotion) { btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop'); }
+    save();
+  }
+
+  /* ---------------- Build: cadence ---------------- */
+  function buildCadence() {
+    renderOptRow('freqRow', FREQ_OPTS, 'frequency');
+    renderOptRow('dayRow', DAY_OPTS, 'delivery_day');
+  }
+  function renderOptRow(rowId, opts, key) {
+    const row = el(rowId);
+    row.innerHTML = '';
+    opts.forEach(o => {
+      const on = state.answers.cadence[key] === o.v;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.textContent = o.l;
+      b.addEventListener('click', () => {
+        state.answers.cadence[key] = o.v;
+        row.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed','false'));
+        b.setAttribute('aria-pressed','true');
+        if (!reduceMotion) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+        save();
+      });
+      row.appendChild(b);
+    });
+  }
+
+  /* ---------------- Free text wiring ---------------- */
+  function wireFreeText() {
+    const map = [['ftLove','always_include'],['ftNever','never_show'],['ftSpot','favorite_spot']];
+    map.forEach(([id, key]) => {
+      const node = el(id);
+      node.value = state.answers.free_text[key] || '';
+      node.addEventListener('input', () => { state.answers.free_text[key] = node.value; save(); });
+    });
+  }
+
+  /* ---------------- Navigation ---------------- */
+  function canAdvance() {
+    if (state.step === 1) return state.answers.interests.length >= 3; // interests min 3
+    return true;
+  }
+  function refreshNav() {
+    const s = state.step;
+    backBtn.classList.toggle('hidden', s === 0);
+    // labels
+    if (s === 0) nextBtn.textContent = "Let's go 💫";
+    else if (s === STEPS.length - 2) nextBtn.textContent = 'Finish 🎈'; // cadence = last question
+    else nextBtn.textContent = 'Next';
+    nextBtn.disabled = !canAdvance();
+    // progress: questions are steps 1..6
+    const totalQ = 6;
+    let pct;
+    if (s === 0) pct = 0;
+    else if (s >= STEPS.length - 1) pct = 100;
+    else pct = Math.round((s / totalQ) * 100);
+    progressFill.style.width = pct + '%';
+    progressBar.setAttribute('aria-valuenow', String(pct));
+    if (s === 0) stepCount.textContent = '';
+    else if (s >= STEPS.length - 1) stepCount.textContent = 'Done';
+    else stepCount.textContent = 'Step ' + s + ' of ' + totalQ;
+    // hide nav entirely on thank-you
+    el('nav').style.display = (s === STEPS.length - 1) ? 'none' : 'block';
+  }
+  function showStep(s) {
+    state.step = s;
+    STEPS.forEach((name, i) => {
+      SCREEN[name].classList.toggle('active', i === s);
+    });
+    // lazy build per step
+    if (s === 2) buildRanking();
+    refreshNav();
+    save();
+    // focus + scroll
+    const active = SCREEN[STEPS[s]];
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    setTimeout(() => { try { active.focus({ preventScroll: true }); } catch(e){} }, 60);
+  }
+  function next() {
+    if (!canAdvance()) { flashHelper(); return; }
+    if (state.step === STEPS.length - 2) { finish(); return; } // from cadence -> submit
+    showStep(state.step + 1);
+  }
+  function back() { if (state.step > 0) showStep(state.step - 1); }
+  function flashHelper() {
+    const h = el('interestsHelper');
+    if (!h) return;
+    h.classList.add('warn');
+    if (!reduceMotion) { h.style.transition = 'none'; h.style.transform = 'translateX(0)';
+      h.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}], {duration:220}); }
+  }
+
+  nextBtn.addEventListener('click', next);
+  backBtn.addEventListener('click', back);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const t = e.target;
+      const typing = t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && t.type === 'text'));
+      const onControl = t && (t.classList.contains('chip') || t.classList.contains('opt') || t.classList.contains('vote') || t.classList.contains('abtn'));
+      if (!typing && !onControl && state.step < STEPS.length - 1) { e.preventDefault(); next(); }
+    }
+  });
+
+  /* ---------------- Payload ---------------- */
+  function buildPayload() {
+    syncRankingFromInterests();
+    const calibration = HH.examples.map(ev => ({
+      id: ev.id, title: ev.title, tag: ev.tag,
+      vote: state.answers.calibration[ev.id] || null
+    }));
+    // clean logistics (drop empty multi arrays / undefined)
+    const logistics = {};
+    Object.keys(state.answers.logistics).forEach(k => {
+      const v = state.answers.logistics[k];
+      if (v === undefined || v === null) return;
+      if (Array.isArray(v) && v.length === 0) return;
+      logistics[k] = v;
+    });
+    return {
+      schema_version: SCHEMA_VERSION,
+      household: HH.key,
+      household_label: HH.label,
+      started_at: state.started_at,
+      submitted_at: new Date().toISOString(),
+      client: {
+        user_agent: navigator.userAgent,
+        timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone) || '',
+        language: navigator.language || ''
+      },
+      interests: state.answers.interests.slice(),
+      ranking: state.answers.ranking.slice(),
+      top5: state.answers.ranking.slice(0, 5),
+      calibration: calibration,
+      logistics: logistics,
+      free_text: {
+        always_include: (state.answers.free_text.always_include || '').trim(),
+        never_show: (state.answers.free_text.never_show || '').trim(),
+        favorite_spot: (state.answers.free_text.favorite_spot || '').trim()
+      },
+      cadence: {
+        frequency: state.answers.cadence.frequency || 'weekly',
+        delivery_day: state.answers.cadence.delivery_day || 'friday'
+      }
+    };
+  }
+
+  /* ---------------- Submit ---------------- */
+  let lastPayload = null;
+  function setSubstate(which) {
+    ['sending','done','error'].forEach(k => el('ss-' + k).classList.toggle('on', k === which));
+  }
+  function showThanks() {
+    STEPS.forEach((name) => SCREEN[name].classList.remove('active'));
+    SCREEN.thanks.classList.add('active');
+    state.step = STEPS.length - 1;
+    refreshNav();
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+  function finish() {
+    lastPayload = buildPayload();
+    // stash the final payload locally so nothing is ever lost
+    try { localStorage.setItem(STORAGE_KEY + '-final', JSON.stringify(lastPayload)); } catch(e){}
+    showThanks();
+    submit();
+  }
+  function submit() {
+    setSubstate('sending');
+    // Local-only mode: no backend wired yet. Still celebrate + keep the saved payload.
+    if (!BACKEND_URL || !/^https?:\/\//i.test(BACKEND_URL)) {
+      setTimeout(() => { setSubstate('done'); celebrate(); }, 500);
+      return;
+    }
+    fetch(BACKEND_URL, {
+      method: 'POST',
+      // text/plain keeps this a "simple request" so Apps Script never sees a CORS preflight
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(lastPayload),
+      redirect: 'follow'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    })
+    .then(() => { setSubstate('done'); celebrate(); })
+    .catch(err => {
+      el('errDetail').textContent = 'We could not reach the guide (' + (err && err.message ? err.message : 'network error') + '). Your answers are safe. Tap to try again.';
+      setSubstate('error');
+      showRetry();
+    });
+  }
+  function showRetry() {
+    const box = el('ss-error');
+    if (box.querySelector('.retry')) return;
+    const b = document.createElement('button');
+    b.className = 'btn btn-primary retry';
+    b.type = 'button';
+    b.style.marginTop = '16px';
+    b.style.width = '100%';
+    b.textContent = 'Try again 🔁';
+    b.addEventListener('click', submit);
+    box.appendChild(b);
+  }
+
+  /* ---------------- Confetti ---------------- */
+  function celebrate() {
+    if (reduceMotion) return;
+    const host = el('confetti');
+    const emojis = ['🎉','💛','✨','🎈','🌿','🎊','💐','⭐'];
+    const n = 26;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('span');
+      s.textContent = emojis[i % emojis.length];
+      const angle = (Math.PI * 2 * i) / n + Math.random() * 0.5;
+      const dist = 120 + Math.random() * 180;
+      s.style.left = '50%';
+      s.style.setProperty('--dx', 'calc(-50% + ' + Math.cos(angle) * dist + 'px)');
+      s.style.setProperty('--dy', (Math.sin(angle) * dist - 40) + 'px');
+      s.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      s.style.animationDelay = (Math.random() * 120) + 'ms';
+      s.style.fontSize = (16 + Math.random() * 16) + 'px';
+      host.appendChild(s);
+    }
+    setTimeout(() => { host.innerHTML = ''; }, 1600);
+  }
+
+  /* ---------------- Init ---------------- */
+  applyHousehold();
+  buildInterests();
+  buildCalibration();
+  buildLogistics();
+  buildCadence();
+  wireFreeText();
+  const resumed = restore();
+  if (resumed) {
+    // re-sync UI to restored answers
+    buildInterests();
+    buildCalibration();
+    buildLogistics();
+    buildCadence();
+    wireFreeText();
+  }
+  showStep(state.step || 0);
+})();
+</script>
+</body>
+</html>
