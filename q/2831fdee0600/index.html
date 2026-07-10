@@ -1225,14 +1225,15 @@
     }
     fetch(BACKEND_URL, {
       method: 'POST',
-      // text/plain keeps this a "simple request" so Apps Script never sees a CORS preflight
+      // no-cors + text/plain: a "simple request" the browser sends to Apps Script without a
+      // preflight. Apps Script sends no CORS headers, so a normal cors read would be BLOCKED
+      // and reject even after a successful write. With no-cors the response is opaque (we
+      // cannot read status), so a resolved promise = delivered; localStorage is the backstop.
+      // Only a real network failure (offline / unreachable) rejects and shows the retry.
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(lastPayload),
       redirect: 'follow'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
     })
     .then(() => { setSubstate('done'); celebrate(); })
     .catch(err => {
