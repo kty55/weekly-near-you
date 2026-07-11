@@ -614,7 +614,12 @@
      Leave blank to run in "local-only" mode (great for previewing):
      answers still save to localStorage, the thank-you still shows.
      ============================================================ */
-  const BACKEND_URL = '';
+  // Logging: a public Google Form. Its formResponse endpoint accepts an anonymous POST from
+  // any browser (no login, no CORS needed), and the newsletter reads the Form's responses to
+  // tune each household's next issue. Two fields: household (short) + payload (full JSON).
+  const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSeX4OmguBrvftOiSPjt0lK7I67u9GwGouwz2fmo9dCtBK7stw/formResponse';
+  const FIELD_HOUSEHOLD = 'entry.114397289';
+  const FIELD_PAYLOAD = 'entry.184414737';
 
   const SCHEMA_VERSION = '1.0';
 
@@ -1218,26 +1223,21 @@
   }
   function submit() {
     setSubstate('sending');
-    // Local-only mode: no backend wired yet. Still celebrate + keep the saved payload.
-    if (!BACKEND_URL || !/^https?:\/\//i.test(BACKEND_URL)) {
-      setTimeout(() => { setSubstate('done'); celebrate(); }, 500);
-      return;
-    }
-    fetch(BACKEND_URL, {
+    var body = new URLSearchParams();
+    body.append(FIELD_HOUSEHOLD, (lastPayload && lastPayload.household) || 'unknown');
+    body.append(FIELD_PAYLOAD, JSON.stringify(lastPayload));
+    // Google Forms accepts an anonymous, CORS-less POST. no-cors makes the response opaque
+    // (we cannot read status), so a resolved promise = delivered; localStorage is the backstop.
+    // Only a real network failure (offline) rejects and shows the retry.
+    fetch(FORM_ACTION, {
       method: 'POST',
-      // no-cors + text/plain: a "simple request" the browser sends to Apps Script without a
-      // preflight. Apps Script sends no CORS headers, so a normal cors read would be BLOCKED
-      // and reject even after a successful write. With no-cors the response is opaque (we
-      // cannot read status), so a resolved promise = delivered; localStorage is the backstop.
-      // Only a real network failure (offline / unreachable) rejects and shows the retry.
       mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(lastPayload),
-      redirect: 'follow'
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: body.toString()
     })
     .then(() => { setSubstate('done'); celebrate(); })
     .catch(err => {
-      el('errDetail').textContent = 'We could not reach the guide (' + (err && err.message ? err.message : 'network error') + '). Your answers are safe. Tap to try again.';
+      el('errDetail').textContent = 'We could not save that (' + (err && err.message ? err.message : 'network error') + '). Your answers are safe. Tap to try again.';
       setSubstate('error');
       showRetry();
     });
