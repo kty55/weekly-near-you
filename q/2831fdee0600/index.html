@@ -1235,7 +1235,7 @@
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
       body: body.toString()
     })
-    .then(() => { setSubstate('done'); celebrate(); })
+    .then(() => { try { localStorage.setItem(STORAGE_KEY + '-sent', '1'); } catch(e){} setSubstate('done'); celebrate(); })
     .catch(err => {
       el('errDetail').textContent = 'We could not save that (' + (err && err.message ? err.message : 'network error') + '). Your answers are safe. Tap to try again.';
       setSubstate('error');
@@ -1294,6 +1294,23 @@
     wireFreeText();
   }
   showStep(state.step || 0);
+
+  // Recovery: if someone finished the quiz before logging was wired (or a submit failed),
+  // their answers are still saved locally. Resend that saved payload silently, once, on load.
+  (function resendSaved(){
+    try {
+      if (localStorage.getItem(STORAGE_KEY + '-sent') === '1') return;
+      var saved = localStorage.getItem(STORAGE_KEY + '-final');
+      if (!saved) return;
+      var p = JSON.parse(saved);
+      var body = new URLSearchParams();
+      body.append(FIELD_HOUSEHOLD, (p && p.household) || 'unknown');
+      body.append(FIELD_PAYLOAD, saved);
+      fetch(FORM_ACTION, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}, body: body.toString() })
+        .then(function(){ try { localStorage.setItem(STORAGE_KEY + '-sent', '1'); } catch(e){} })
+        .catch(function(){});
+    } catch(e){}
+  })();
 })();
 </script>
 </body>
